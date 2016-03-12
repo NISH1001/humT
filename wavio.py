@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from scipy.signal import wiener
+from scipy.signal import firwin,medfilt
 from scipy.fftpack import rfft, irfft
 
 import matplotlib.pyplot as plt
@@ -28,10 +28,9 @@ def readwav(filename):
         spf=wave.open(filename)
         signal = np.fromstring(spf.readframes(SAMP_F),dtype=np.int16)
         return signal
-    except :
-        raise AudioError("file can't read")
+    except Exception as e :
+        raise AudioError("Cant read audio")
         return None
-    # still confused on Exception
 
 def writewav24(filename, rate, data):
     """
@@ -64,7 +63,7 @@ def denormalize(a):
     return a*100000
 
 
-def passFilter(signal):
+def band_pass(signal):
     """
     remove lower and higher freqiescies
     pass between 25 Hz to 10 kHz
@@ -77,9 +76,25 @@ def passFilter(signal):
     a[highpass:]=0
     return np.fft.irfft(a)
 
+def afilter(signal):
+    """
+    filter uses bandpass and medfilter(median filter) from module signal
+    output numpy array same size as input
+    """
+    #signal=wiener(signal,mysize=50,noise=0.25)
+    #input: signal array, window size, noise to reduce in dB
+
+    f1=30
+    f2=10000
+
+    signal=firwin(signal,[f1,f2],nyq=SAMP_F,pass_zero=False)
+
+    signal=medfilt(signal,kernel_size=9)
+    #kernel_size : median filter window, always odd
+    return signal
 
 def main():
-    signal=readwav("audio/input.wav")
+    signal=readwav("../audio/input.wav")
 
     plt.figure(1)
     a=plt.subplot(2,1,1)
@@ -90,9 +105,8 @@ def main():
     plt.title("unfiltered")
     plt.plot(signal)
 
-
-    signal=wiener(signal,mysize=50,noise=0.25)
-    signal=passFilter(signal)
+    #signal=band_pass(signal)
+    signal=afilter(signal)
 
     left,right=signal[0::2],signal[1::2]
     lf,rf=np.fft.rfft(left),np.fft.rfft(right)
