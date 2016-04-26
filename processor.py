@@ -92,14 +92,16 @@ def fdtw(x, y, dist_metric):
     # cost = sum([ dist_metric[x, y] for[y, x] in path ])
     return path, cost
 
-"""
 def myclip(x, _min, _max):
     return min(max(x, _min), _max)
 
 def euc(x, y):
     return (x-y) ** 2
 
-def dtw(a,b,distmetric,localize=None):
+# copy pasted from Neeraj and crew
+# cuz mine was shit and this has even
+# got localization
+def dtw(a, b, distmetric, localize=None):
     D = [[10E16]*(len(b)+1)]*(len(a)+1)
     for i in range(len(a)):
         D[i+1][0] = 10E16
@@ -141,7 +143,6 @@ def dtw(a,b,distmetric,localize=None):
             path = [(x,0) for x in range(i-1)]+path
             break
     return D[len(a)][len(b)],path
-"""
 
 # normalize the time series data by mean
 def normalize(vec):
@@ -161,29 +162,21 @@ def normalize(vec):
 def main():
     print("testing")
 
-    # mine
-    x = normalize(track_pitch("test1.wav"))
+    z = normalize(track_pitch("original.wav"))
 
-    # another song
-    y = normalize(track_pitch("test2.wav"))
+    x = normalize(track_pitch("nearOriginal.wav"))
+    y = normalize(track_pitch("notNearOriginal.wav"))
+    a = normalize(track_pitch("original1.wav"))
+    b = normalize(track_pitch("nearOriginal2.wav"))
 
-    # original song
-    z = normalize(track_pitch("test.wav"))
-
-    # compare x and y using numpy distance matrix
-    start = time.time()
-    distances = euclidean(x, z, numpy_use=True)
-    path, cost = fdtw(x, z, distances)
-    print(time.time() - start)
-    print(cost)
-
-    start = time.time()
-    distances = euclidean(y, z, numpy_use=True)
-    path, cost = fdtw(y, z, distances)
-    print(time.time() - start)
-    print(cost)
-
-    #dtwdist, dtwpath = dtw(x, z, euc, 14)
+    dtwdist, dtwpath = dtw(x, z, euc, 14)
+    print(dtwdist)
+    dtwdist, dtwpath = dtw(y, z, euc, 14)
+    print(dtwdist)
+    dtwdist, dtwpath = dtw(a, z, euc, 14)
+    print(dtwdist)
+    dtwdist, dtwpath = dtw(b, z, euc, 14)
+    print(dtwdist)
 
 if __name__ == "__main__":
     main()
