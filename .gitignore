@@ -5,6 +5,13 @@ __pycache__/
 # C extensions
 *.so
 
+# ignorance is bliss
+*.mp3
+*.wav
+*.jpg
+*.png
+*.jpeg
+
 *.png
 *.swp
 *.jpeg

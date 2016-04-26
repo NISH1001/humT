@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plot
 import time
-
+from pextraction import track_pitch
 
 def euclidean(x,y, numpy_use = True):
     """
@@ -22,6 +22,7 @@ def euclidean(x,y, numpy_use = True):
             for j in range(lx):
                 distances[i,j] = (x[j] - y[i])**2
     return distances
+
 
 def fdtw(x, y, dist_metric):
     """
@@ -91,45 +92,98 @@ def fdtw(x, y, dist_metric):
     # cost = sum([ dist_metric[x, y] for[y, x] in path ])
     return path, cost
 
+"""
+def myclip(x, _min, _max):
+    return min(max(x, _min), _max)
+
+def euc(x, y):
+    return (x-y) ** 2
+
+def dtw(a,b,distmetric,localize=None):
+    D = [[10E16]*(len(b)+1)]*(len(a)+1)
+    for i in range(len(a)):
+        D[i+1][0] = 10E16
+    for i in range(len(b)):
+        D[0][i+1] = 10E16
+    D[0][0]=0
+    # Don't let the window size be less than the size difference
+    if localize!=None:
+        localize = max(abs(localize),abs(len(a)-len(b)))
+    for i in range(len(a)):
+        if localize==None:
+            left,right = 0,len(b)-1
+        else:
+            left = myclip(i-localize,0,len(b)-1)
+            right = myclip(i+localize,0,len(b)-1)
+        for j in range(left,right+1):
+            cost = distmetric(a[i],b[j])
+            D[i+1][j+1] = cost+min((D[i][j+1],D[i+1][j],D[i][j]))
+    i,j = len(a),len(b)
+    path = [(i-1,j-1)]
+    while True:
+        prev = [D[i-1][j-1],D[i-1][j],D[i][j-1]]
+        m = prev.index(min(prev))
+        if m==0:
+            path = [(i-2,j-2)]+path
+            i,j=i-1,j-1
+        elif m==1:
+            path = [(i-2,j-1)]+path
+            i=i-1
+        else:
+            path = [(i-1,j-2)]+path
+            j=j-1
+        if i==1 and j==1:
+            break
+        elif i==1:
+            path = [(0,x) for x in range(j-1)]+path
+            break
+        elif j==1:
+            path = [(x,0) for x in range(i-1)]+path
+            break
+    return D[len(a)][len(b)],path
+"""
+
+# normalize the time series data by mean
+def normalize(vec):
+    vals = vec[0::2]
+    mx, mn = max(vals), min(vals)
+    mean, totf = 0, 0
+    for i in range(0, len(vec), 2):
+        totf += vec[i+1]
+        val = vec[i] * vec[i+1]
+        mean += val
+    mean /= totf
+    l = [   (vec[i] - mean)/(mx - mn)  \
+            for i in range(0, len(vec), 2) 
+        ]
+    return l
 
 def main():
-    #x = np.array([1, 0, 2, 3, 4, 5])
-    #y = np.array([0, 1, 0, 0, 4, 5, 0, 0])
-    #y1 = np.array([2, 3, 4, 0, 6])
+    print("testing")
 
-    # random samples
-    count = 1000
-    x = np.random.randint(0, count, count)
-    y = np.random.randint(0, count, count+500)
-    y1 = np.random.randint(0, count, count+1000)
-    
-    # some benchmarkings and samples
+    # mine
+    x = normalize(track_pitch("test1.wav"))
+
+    # another song
+    y = normalize(track_pitch("test2.wav"))
+
+    # original song
+    z = normalize(track_pitch("test.wav"))
 
     # compare x and y using numpy distance matrix
     start = time.time()
-    distances = euclidean(x, y, numpy_use=True)
-    path, cost = fdtw(x, y, distances)
+    distances = euclidean(x, z, numpy_use=True)
+    path, cost = fdtw(x, z, distances)
     print(time.time() - start)
     print(cost)
 
-    # compare x and y using own distance matrix
     start = time.time()
-    path, cost = fdtw(x, y, euclidean(x, y, numpy_use=False))
+    distances = euclidean(y, z, numpy_use=True)
+    path, cost = fdtw(y, z, distances)
     print(time.time() - start)
     print(cost)
 
-    # compare x and y1 using numpy distance matrix
-    start = time.time()
-    distances = euclidean(x, y1, numpy_use=True)
-    path, cost = fdtw(x, y1, distances)
-    print(time.time() - start)
-    print(cost)
-
-    # compare x and y1 using own distance matrix
-    start = time.time()
-    path, cost = fdtw(x, y1, euclidean(x, y1, numpy_use=False))
-    print(time.time()-start)
-    print(cost)
+    #dtwdist, dtwpath = dtw(x, z, euc, 14)
 
 if __name__ == "__main__":
     main()

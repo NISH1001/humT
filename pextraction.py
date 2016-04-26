@@ -47,4 +47,8 @@ def track_pitch(inputFilename):
     
     return pitches
 
-print(track_pitch("test.mp3"))
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()
