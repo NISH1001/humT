@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 import time
-from pextraction import track_pitch
+from pextraction import track_pitch 
+from visualizer import timeseries
 
 def euclidean(x,y, numpy_use = True):
     """
@@ -162,8 +163,11 @@ def normalize(vec):
 def main():
     print("testing")
 
-    z = normalize(track_pitch("original.wav"))
+    z =track_pitch("original.wav")
+    timeseries(z)
+    z = normalize(z)
 
+    """
     x = normalize(track_pitch("nearOriginal.wav"))
     y = normalize(track_pitch("notNearOriginal.wav"))
     a = normalize(track_pitch("original1.wav"))
@@ -177,6 +181,7 @@ def main():
     print(dtwdist)
     dtwdist, dtwpath = dtw(b, z, euc, 14)
     print(dtwdist)
+    """
 
 if __name__ == "__main__":
     main()
