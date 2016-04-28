@@ -5,12 +5,19 @@ __pycache__/
 # C extensions
 *.so
 
-*.jpeg
-*.jpg
-*.png
-*.swp
+# ignorance is bliss
 *.mp3
 *.wav
+*.jpg
+*.png
+*.jpeg
+
+*.png
+*.swp
+*.jpeg
+*.wav
+*.mp3
+*.jpg
 
 # Distribution / packaging
 .Python
