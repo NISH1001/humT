@@ -41,7 +41,7 @@ class Recorder:
 def main():
     recorder = Recorder()
     frames = recorder.start(5)
-    recorder.write_wav(frames, "shit.wav")
+    recorder.write_wav(frames, "input.wav")
 
 if __name__ == "__main__":
     main()

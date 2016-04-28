@@ -6,6 +6,8 @@ import time
 from pextraction import track_pitch 
 from visualizer import timeseries
 
+from recorder import Recorder
+
 def euclidean(x,y, numpy_use = True):
     """
     returns euclidean distance matrix
@@ -23,7 +25,6 @@ def euclidean(x,y, numpy_use = True):
             for j in range(lx):
                 distances[i,j] = (x[j] - y[i])**2
     return distances
-
 
 def fdtw(x, y, dist_metric):
     """
@@ -163,25 +164,25 @@ def normalize(vec):
 def main():
     print("testing")
 
+    recorder = Recorder()
+    frames = recorder.start(5)
+    recorder.write_wav(frames, "input.wav")
+
     z =track_pitch("original.wav")
-    timeseries(z)
     z = normalize(z)
 
-    """
-    x = normalize(track_pitch("nearOriginal.wav"))
     y = normalize(track_pitch("notNearOriginal.wav"))
-    a = normalize(track_pitch("original1.wav"))
-    b = normalize(track_pitch("nearOriginal2.wav"))
 
+    print("hum vs original")
+    x = track_pitch("input.wav")
+    timeseries(x)
+    x = normalize(x)
     dtwdist, dtwpath = dtw(x, z, euc, 14)
     print(dtwdist)
-    dtwdist, dtwpath = dtw(y, z, euc, 14)
+
+    print("hum vs non-original")
+    dtwdist, dtwpath = dtw(x, y, euc, 14)
     print(dtwdist)
-    dtwdist, dtwpath = dtw(a, z, euc, 14)
-    print(dtwdist)
-    dtwdist, dtwpath = dtw(b, z, euc, 14)
-    print(dtwdist)
-    """
 
 if __name__ == "__main__":
     main()
