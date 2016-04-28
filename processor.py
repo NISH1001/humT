@@ -163,26 +163,5 @@ def normalize(vec):
 
 def main():
     print("testing")
-
-    recorder = Recorder()
-    frames = recorder.start(5)
-    recorder.write_wav(frames, "input.wav")
-
-    z =track_pitch("original.wav")
-    z = normalize(z)
-
-    y = normalize(track_pitch("notNearOriginal.wav"))
-
-    print("hum vs original")
-    x = track_pitch("input.wav")
-    timeseries(x)
-    x = normalize(x)
-    dtwdist, dtwpath = dtw(x, z, euc, 14)
-    print(dtwdist)
-
-    print("hum vs non-original")
-    dtwdist, dtwpath = dtw(x, y, euc, 14)
-    print(dtwdist)
-
 if __name__ == "__main__":
     main()
