@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from scipy.signal import firwin,medfilt
 from scipy.fftpack import rfft, irfft
+from scipy.signal import wiener
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,6 +16,10 @@ class AudioError(Exception):
     def Display(self):
         print("Audio Synthetis error:"+''.join(self.args))
 
+
+#class WaveIO(object):
+#    def __init__(self):
+#        self.self=signal
 
 def readwav(filename):
 
@@ -69,8 +74,8 @@ def band_pass(signal):
     pass between 25 Hz to 10 kHz
 
     """
-    lowpass=25
-    highpass=10000
+    lowpass=50
+    highpass=8000
     a=np.fft.rfft(signal)
     a[:lowpass]=0
     a[highpass:]=0
@@ -78,22 +83,22 @@ def band_pass(signal):
 
 def afilter(signal):
     """
-    filter uses bandpass and medfilter(median filter) from module signal
+    filter uses bandpass, wiener filter and medfilter(median filter) from module signal
     output numpy array same size as input
     """
-    #signal=wiener(signal,mysize=50,noise=0.25)
-    #input: signal array, window size, noise to reduce in dB
+    signalflt = band_pass(signal)
 
-    f1=30
-    f2=10000
+    """ signal=medfilt(signal,kernel_size=3)
+        kernel_size : median filter window, always odd
+        default =3 
+    """
+    signalflt = medfilt(signal,17)
 
-    signal=firwin(signal,[f1,f2],nyq=SAMP_F,pass_zero=False)
+    signalflt=wiener(signal,mysize = 100,noise = 0.25)
 
-    signal=medfilt(signal,kernel_size=9)
-    #kernel_size : median filter window, always odd
-    return signal
+    return signalflt
 
-def main():
+if __name__=='__main__':
     signal=readwav("../audio/input.wav")
 
     plt.figure(1)
@@ -104,11 +109,15 @@ def main():
     a.set_ylabel('sample value[-]')
     plt.title("unfiltered")
     plt.plot(signal)
+    b=plt.subplot(2,1,2)
+    b.set_xscale('log')
+    b.set_xlabel('frequency[Hz]')
+    b.set_ylabel('|amplitude|')
+    plt.plot(abs(np.fft.rfft(signal[0::2])))
 
-    #signal=band_pass(signal)
-    signal=afilter(signal)
+    signalflt = afilter(signal)
 
-    left,right=signal[0::2],signal[1::2]
+    left,right=signalflt[0::2],signalflt[1::2]
     lf,rf=np.fft.rfft(left),np.fft.rfft(right)
 
     plt.figure(2)
@@ -127,7 +136,3 @@ def main():
     plt.plot(abs(lf))
 
     plt.show()
-
-
-if __name__=='__main__':
-    main()
