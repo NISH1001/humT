@@ -28,6 +28,8 @@ def similarityPlot(hum,org,path):
     i = 1   
     for [map_x,map_y] in path:
         #for every 50 paths show only 1
+        if map_x > len(hum) or map_y > len(org):
+            break
         if i % 50 == 0:
             plt.plot([map_x,map_y],[hum[map_x],org[map_y]],'r')
             i = 1
