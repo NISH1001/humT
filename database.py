@@ -8,6 +8,7 @@ from pextraction import track_pitch
 def load():
     data = {}
     try:
+        #saving the files in storage.json file
         datastr = open("storage.json").read()
         data = json.loads(datastr)
     except FileNotFoundError:

@@ -5,7 +5,7 @@ import wave
 
 class Recorder:
     def __init__(self, fmt=pyaudio.paInt16,
-            channels=2, rate=44100, chunk=1024,
+            channels=2, rate=44100, chunk=512,
             ):
         self.audio = pyaudio.PyAudio()
         self.fmt = fmt
