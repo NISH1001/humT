@@ -57,11 +57,27 @@ def track_pitch(inputFilename):
     for p in range(0,len(pitches)-2,2):
         #converting the pitches value to the index of the notePitches
         #This is like mapping the frequencies to the musical notes
-        currPitch += [min(range(len(notePitches)),key = lambda i: abs(notePitches[i]- pitches[p])), pitches[p+1]]
-        
+        tempPitch = [min(range(len(notePitches)),key = lambda i: abs(notePitches[i]- pitches[p])), pitches[p+1]] 
+        currPitch += tempPitch
         #pitchSlope += [abs(currPitch - nextPitch)/pitchLen]
-    print(currPitch)
-    return currPitch
+    
+    #now we shall see the pitches direction +1,-1 or 0
+    
+    pitchDirection = []
+    initialPitch = currPitch[0]
+
+    for p in range(2,len(currPitch),2):
+        pitchDifference = currPitch[p] - initialPitch
+        if pitchDifference > 0:
+            pitchDirection.append(1)
+        elif pitchDifference <0:
+            pitchDirection.append(-1)
+        else:
+            pitchDirection.append(0)
+        initialPitch = currPitch[p]
+
+    return currPitch,pitchDirection
+
 
 def main():
     pass
