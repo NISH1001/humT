@@ -21,17 +21,17 @@ def timeseries(*arg):
     plt.show()
 
 #shows the similarity plot between hum and original
-def similarityPlot(hum,org,path):
+def similarityPlot(hum,org,path,jump):
     #plotting the similarity
     plt.plot(hum,'b',label='Hummed Tune')
     plt.plot(org,'g',label='Original Tune')
     i = 1   
     for [map_x,map_y] in path:
-        #for every 50 paths show only 1
-        if map_x > len(hum) or map_y > len(org):
+        #for every jump value of paths show only 1
+        if map_x > len(org) or map_y > len(hum):
             break
-        if i % 50 == 0:
-            plt.plot([map_x,map_y],[hum[map_x],org[map_y]],'r')
+        if i % jump == 0:
+            plt.plot([map_x,map_y],[org[map_x],hum[map_y]],'r')
             i = 1
         else:
             i = i+1
