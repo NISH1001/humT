@@ -1,38 +1,54 @@
 #!/usr/bin/env python3
 
+#inbuilt imports
 import json
 import sys
 
+#source imports
 from pextraction import track_pitch
 
-def load():
-    data = {}
-    try:
-        #saving the files in storage.json file
-        datastr = open("storage.json").read()
-        data = json.loads(datastr)
-    except FileNotFoundError:
-        open("storage.json", "w").write('')
-        return {}
-    return data
+class Database:
+    
+    def __init__(self,filen = 'storage.json',wavefile = None,alias = None):
+        self.__file_name = filen
+        self.__wavefile = wavefile
+        self.__alias = alias
+    
 
-def store(wavefile, alias):
-    print("extracting pitches...")
-    data = load()
-    data[alias] = {}
-    if data[alias]:
-        return
-
-    d = {}
-    d['wavefile'] = wavefile
-    d['pitches'] = track_pitch(wavefile)
-    data[alias] = d
-    datastr = json.dumps(data, indent=4)
-    open("storage.json", "w").write(datastr)
+    def load(self):
+        data = {}
+        try:
+            #saving the files in storage.json file
+            datastr = open(self.__file_name).read()
+            data = json.loads(datastr)
+        except FileNotFoundError:
+            open(self.__file_name, "w").write('')
+            return {}
+        return data
+    
+    def store(self):
+        print("extracting pitches...")
+        data = self.load()
+        data[self.__alias] = {}
+        if data[self.__alias]:
+            return
+         
+        d = {}
+        d['wavefile'] = self.__wavefile
+        pitch = []
+        difference = []
+        pitch,difference = track_pitch(self.__wavefile)
+        d['pitch'] = pitch
+        d['difference'] = difference
+        data[self.__alias] = d
+        datastr = json.dumps(data, indent=4)
+        open(self.__file_name, "w").write(datastr)
 
 def main():
-    argv = sys.argv[1:]
-    store(argv[0], argv[1])
+    argv = sys.argv[1:] 
+    d = Database('storage.json',argv[0],argv[1])
+    d.store()
+
 
 if __name__ == "__main__":
     main()
