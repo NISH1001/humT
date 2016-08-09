@@ -24,7 +24,7 @@ class PathDistancePairs:
         self._pdp[distance] = path,org,hum
         
     def pathDistanceCalc(self):
-        self._shortest_distance = min(d for d,value in self._pdp.iteritems())
+        self._shortest_distance = min(d for d,value in self._pdp.items())
          
         path_chunk_pairs= self._pdp[self._shortest_distance]
         #shortest path corresponding to minimum distance
