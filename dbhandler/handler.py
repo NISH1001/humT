@@ -4,6 +4,8 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 
+import numpy as np
+
 #import settings
 from . import settings
 from .models import DeclarativeBase, Song, Feature
@@ -34,8 +36,14 @@ class DBHandler:
         f = Feature(values = feature, type=feature_type)
         s = Song(name=song_name)
         sn = session.query(Song).get(song_name)
+
+        # check if song is already in db
         if sn:
             s = sn
+        # now check if feature is already in the db
+        for feat in s.features:
+            if feat.type == feature_type:
+                session.query(Feature).filter(Feature.type == feature_type).delete(synchronize_session=False)
         s.features.append(f)
         session.add(f)
         session.add(s)
@@ -57,6 +65,13 @@ class DBHandler:
         ret = ret.split(',')
         ret = [ int(x) for x in ret]
         return ret
+
+    def query_song_all(self):
+        Session = sessionmaker(bind=self.engine)
+        session = Session()
+        songs = session.query(Song).all()
+        for song in songs:
+            yield song.name
 
     def display(self, song):
         print(song.name)

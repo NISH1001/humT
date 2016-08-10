@@ -7,6 +7,23 @@ import sys
 #source imports
 from pextraction import track_pitch
 
+from dbhandler import handler
+
+class DatabaseQL:
+
+    def __init__(self):
+        pass
+
+    def store(self, wavefile, song_name):
+        db = handler.DBHandler()
+        pitch, difference = track_pitch(wavefile)
+        db.insert(song_name, pitch, "PITCH")
+        db.insert(song_name, difference, "DIFFERENCE")
+
+    def load(self):
+        db = handler.DBHandler()
+        return db.query_song_all()
+
 class Database:
     
     def __init__(self,filen = 'storage.json',wavefile = None,alias = None):
@@ -46,8 +63,10 @@ class Database:
 
 def main():
     argv = sys.argv[1:] 
-    d = Database('storage.json',argv[0],argv[1])
-    d.store()
+    #d = Database('storage.json',argv[0],argv[1])
+    #d.store()
+    d = DatabaseQL()
+    d.store(argv[0], argv[1])
 
 
 if __name__ == "__main__":

@@ -5,7 +5,8 @@
 import numpy as np
 from visualizer import timeseries, pitchToTimeseries, similarityPlot
 from recorder import Recorder
-from database import Database
+from database import Database, DatabaseQL
+from dbhandler import handler
 
 #inbuilt imports
 from fastdtw import fastdtw
@@ -107,18 +108,29 @@ def process(hum,diff_hum):
     hum = pitchToTimeseries(hum) 
     global prevDistance
 
+    """
     Data = Database()
     data = Data.load()
+    """
     
     l = {}
 
     hum_org = hum
     diff_hum_org = diff_hum
+
+    dbh = handler.DBHandler()
+    data = dbh.query_song_all()
     
     for alias in data:
         #setting input waveform
-        original = data[alias]['pitch']
-        diff_org = data[alias]['difference']
+
+        #original = data[alias]['pitch']
+        #diff_org = data[alias]['difference']
+
+
+        original = np.array(dbh.query(alias, 'PITCH'))
+        diff_org = np.array(dbh.query(alias, 'DIFFERENCE'))
+
         #convert org to time series
         org = pitchToTimeseries(original)
        
