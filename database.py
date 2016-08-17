@@ -62,11 +62,16 @@ class Database:
         open(self.__file_name, "w").write(datastr)
 
 def main():
-    argv = sys.argv[1:] 
-    #d = Database('storage.json',argv[0],argv[1])
-    #d.store()
+    name = ""
+    argv = sys.argv[1:]
     d = DatabaseQL()
-    d.store(argv[0], argv[1])
+    if str(argv[0]) == "show":
+        data = d.load()
+        for n in data:
+            name += n +'\n'
+        print (name)
+    else:
+        d.store(argv[0], argv[1])
 
 
 if __name__ == "__main__":
